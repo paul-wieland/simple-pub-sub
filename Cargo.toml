@@ -1,0 +1,12 @@
+[package]
+name = "simple-pub-sub"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = "1.0.188"
+futures = "0.3.28"
+tokio = { version = "1.41.0", features = ["rt", "rt-multi-thread", "macros"] }
+
+[dependencies.mongodb]
+version = "3.1.0"
