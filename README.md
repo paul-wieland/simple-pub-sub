@@ -1,4 +1,4 @@
-
+# Simple Pub Sub
 
 
 https://chesedo.me/blog/manual-dependency-injection-rust/
