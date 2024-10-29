@@ -27,7 +27,6 @@ impl TopicPersistenceAdapter{
 
 impl TopicPersistencePort for TopicPersistenceAdapter {
     async fn create_topic(&self, topic: Topic) -> Result<(), Box<dyn Error>> {
-
         let project_name = topic.project.clone();
         let topic_name = topic.topic.clone();
 
@@ -37,18 +36,16 @@ impl TopicPersistencePort for TopicPersistenceAdapter {
 
         let topic_entity: TopicEntity = topic.into();
 
-        return match self.collection::<TopicEntity>().insert_one(topic_entity).await {
-            Ok(_) => { Ok(()) }
-            _ => { Err(format!("Error: could not create project {} and topic {}", &project_name, &topic_name).into()) }
-        }
+        self.collection::<TopicEntity>().insert_one(topic_entity).await
+            .map(|_| { () })
+            .map_err(|_| format!("Error: could not create project {} and topic {}", &project_name, &topic_name).into())
     }
 
     async fn find_topic(&self, project: &String, topic: &String) -> Result<Option<Topic>, Box<dyn Error>> {
         let filter = doc! { "project": project, "topic": topic};
-        return match self.collection::<TopicEntity>().find_one(filter).await {
-            Ok(Some(entity)) => { Ok(Some(Topic::from(entity))) }
-            Ok(None) => { Ok(None) }
-            Err(_) => { Err(format!("Error: could not query find_one with project {} and topic {}", project, topic).into())}
-        };
+        self.collection::<TopicEntity>().find_one(filter)
+            .await
+            .map(|entity| { entity.map(Topic::from) })
+            .map_err(|_| format!("Error: could not query find_one with project {} and topic {}", project, topic).into())
     }
 }
