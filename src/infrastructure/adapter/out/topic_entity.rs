@@ -9,11 +9,11 @@ pub struct TopicEntity{
     pub created: DateTime,
 }
 
-impl Into<TopicEntity> for Topic{
-    fn into(self) -> TopicEntity{
+impl From<Topic> for TopicEntity{
+    fn from(value: Topic) -> Self {
         TopicEntity{
-            project: self.project.clone(),
-            topic: self.topic.clone(),
+            project: value.project.clone(),
+            topic: value.topic.clone(),
             created: DateTime::now(),
         }
     }
