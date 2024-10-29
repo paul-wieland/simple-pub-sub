@@ -22,12 +22,12 @@ impl MongoDbClient {
         }
     }
 
-    pub fn collection<T: Send + Sync>(&self, collection_name: &String) -> Collection<T>{
-        return self.client.database(&self.database_name).collection(collection_name)
+    pub fn collection<T: Send + Sync>(&self, collection_name: &str) -> Collection<T>{
+        self.client.database(&self.database_name).collection(collection_name)
     }
 
-    async fn initialize_client_options(connection_string: &String) -> Result<ClientOptions, Box<dyn Error>> {
-        return match ClientOptions::parse(connection_string).await {
+    async fn initialize_client_options(connection_string: &str) -> Result<ClientOptions, Box<dyn Error>> {
+        match ClientOptions::parse(connection_string).await {
             Ok(client_options) => { Ok(client_options) }
             Err(_) => {Err(format!("Could not initialize MongoDB connection from connection string: {}", connection_string).into())}
         }

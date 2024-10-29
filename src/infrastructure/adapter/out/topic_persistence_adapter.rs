@@ -1,5 +1,5 @@
 use std::error::Error;
-use mongodb::bson::{DateTime, doc, Document};
+use mongodb::bson::{doc};
 use mongodb::Collection;
 use crate::domain::model::topic::Topic;
 use crate::domain::ports::topic_persistence_port::TopicPersistencePort;
@@ -20,7 +20,7 @@ impl TopicPersistenceAdapter{
     }
 
     fn collection<T: Send + Sync>(&self) -> Collection<T>{
-        return self.mongodb_client.collection(&self.topic_collection_name)
+        self.mongodb_client.collection(&self.topic_collection_name)
     }
 
 }
@@ -37,11 +37,11 @@ impl TopicPersistencePort for TopicPersistenceAdapter {
         let topic_entity: TopicEntity = topic.into();
 
         self.collection::<TopicEntity>().insert_one(topic_entity).await
-            .map(|_| { () })
+            .map(|_| { })
             .map_err(|_| format!("Error: could not create project {} and topic {}", &project_name, &topic_name).into())
     }
 
-    async fn find_topic(&self, project: &String, topic: &String) -> Result<Option<Topic>, Box<dyn Error>> {
+    async fn find_topic(&self, project: &str, topic: &str) -> Result<Option<Topic>, Box<dyn Error>> {
         let filter = doc! { "project": project, "topic": topic};
         self.collection::<TopicEntity>().find_one(filter)
             .await
