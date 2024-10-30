@@ -13,6 +13,13 @@ curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics' \
 
 ### Create a subscription
 
+```
+curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic' \
+--header 'Content-Type: application/json' \
+--data '{
+    "subscription": "my-subscription"
+}'
+```
 
 https://chesedo.me/blog/manual-dependency-injection-rust/
 
