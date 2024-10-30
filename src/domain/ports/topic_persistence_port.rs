@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use crate::domain::model::topic::Topic;
 
 #[async_trait]
-pub trait TopicPersistencePort{
+pub trait TopicPersistencePort : Send + Sync{
 
     async fn create_topic(&self, topic: Topic) -> Result<(), Box<dyn Error>>;
 

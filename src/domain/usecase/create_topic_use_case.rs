@@ -2,7 +2,7 @@ use std::error::Error;
 use crate::domain::model::topic::Topic;
 use crate::domain::ports::topic_persistence_port::TopicPersistencePort;
 
-pub struct CreateTopicUseCase{
+pub struct CreateTopicUseCase {
     topic_persistence_port: Box<dyn TopicPersistencePort>
 }
 
