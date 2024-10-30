@@ -28,7 +28,7 @@ impl TopicRepository{
         let topic_name = topic.topic.clone();
 
         if let Ok(Some(_)) = self.find_topic(&project_name, &topic_name).await{
-            return Err(ServiceError::ResourceExists(format!("Topic {} in project {} already exists", topic.topic, topic.project)))
+            return Err(ServiceError::ResourceExists)
         }
 
         let topic_entity: TopicEntity = TopicEntity::from(topic);

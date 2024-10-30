@@ -1,4 +1,3 @@
-use std::error::Error;
 use crate::domain::model::service_error::ServiceError;
 use crate::domain::model::topic::Topic;
 use crate::domain::ports::topic_persistence_port::TopicPersistencePort;

@@ -25,7 +25,7 @@ pub async fn create_topic(
 
     match use_case.create_topic(topic).await{
         Ok(_) => { HttpResponse::Created().finish() }
-        Err(ServiceError::ResourceExists(_)) => { HttpResponse::Conflict()
+        Err(ServiceError::ResourceExists) => { HttpResponse::Conflict()
             .json(format!("Topic `{}` already exists in project `{}`", topic_dto.topic, project_path.project))
         }
         _ => { HttpResponse::InternalServerError().finish() }
