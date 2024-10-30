@@ -1,5 +1,6 @@
 use std::error::Error;
 use async_trait::async_trait;
+use crate::domain::model::service_error::ServiceError;
 use crate::domain::model::topic::Topic;
 use crate::domain::ports::topic_persistence_port::TopicPersistencePort;
 use crate::infrastructure::adapter::out::topic::topic_repository::TopicRepository;
@@ -18,7 +19,7 @@ impl TopicPersistenceAdapter{
 
 #[async_trait]
 impl TopicPersistencePort for TopicPersistenceAdapter {
-    async fn create_topic(&self, topic: Topic) -> Result<(), Box<dyn Error>> {
+    async fn create_topic(&self, topic: Topic) -> Result<(), ServiceError> {
         self.topic_repository.create_topic(topic).await
     }
 
