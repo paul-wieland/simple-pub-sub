@@ -7,6 +7,7 @@ use crate::infrastructure::adapter::config::http_server_config::HttpServerConfig
 #[actix_web::main]
 async fn main() -> Result<(), Box<dyn Error>>{
 
-
+    // Start http server
     HttpServerConfig::run().await
+
 }
