@@ -17,18 +17,19 @@ impl HttpServerConfig{
     pub async fn run() -> Result<(), Box<dyn Error>> {
 
         // Setup Topic UseCase
-        let topic_persistence_adapter = TopicPersistenceAdapter::new().await?;
+
         let create_topic_use_case =
             Arc::new(
-                CreateTopicUseCase::new(
-                    Box::new(topic_persistence_adapter)));
+                CreateTopicUseCase::new(Box::new(TopicPersistenceAdapter::new().await?)));
 
         // Setup Subscription UseCase
         let subscription_persistence_adapter = SubscriptionPersistenceAdapter::new().await?;
         let create_subscription_use_case =
             Arc::new(
                 CreateSubscriptionUseCase::new(
-                    Box::new(subscription_persistence_adapter)));
+                    Box::new(subscription_persistence_adapter),
+                    Box::new(TopicPersistenceAdapter::new().await?))
+            );
 
         HttpServer::new(move || {
             App::new()

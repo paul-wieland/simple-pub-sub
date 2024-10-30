@@ -27,6 +27,7 @@ pub async fn create_subscription(
 
     match use_case.create_subscription(subscription).await{
         Ok(_) => { HttpResponse::Created().finish() }
+        Err(ServiceError::ResourceNotExists(message)) => { HttpResponse::BadRequest().json(message) }
         Err(ServiceError::ResourceExists) => { HttpResponse::Conflict()
             .json(format!("Subscription `{}` already exists in project `{}` and topic `{}`",
                           subscription_dto.subscription, subscription_path.project, subscription_path.topic))
