@@ -14,7 +14,7 @@ curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics' \
 ### Create a subscription
 
 ```
-curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic' \
+curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/subscriptions' \
 --header 'Content-Type: application/json' \
 --data '{
     "subscription": "my-subscription"
