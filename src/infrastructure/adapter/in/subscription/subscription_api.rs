@@ -12,7 +12,7 @@ struct SubscriptionPath{
     topic: String
 }
 
-#[post("/v1/projects/{project}/topics/{topic}")]
+#[post("/v1/projects/{project}/topics/{topic}/subscriptions")]
 pub async fn create_subscription(
     subscription_dto: web::Json<SubscriptionDto>,
     use_case: web::Data<Arc<CreateSubscriptionUseCase>>,
