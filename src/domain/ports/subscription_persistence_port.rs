@@ -7,4 +7,6 @@ pub trait SubscriptionPersistencePort : Send + Sync{
 
     async fn create_subscription(&self, subscription: Subscription) -> Result<(), ServiceError>;
 
+    async fn find_many_subscriptions(&self, project: &str, topic: &str) -> Result<Vec<Subscription>, ServiceError>;
+
 }
