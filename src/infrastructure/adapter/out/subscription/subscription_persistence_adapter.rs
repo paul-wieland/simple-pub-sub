@@ -24,4 +24,15 @@ impl SubscriptionPersistencePort for SubscriptionPersistenceAdapter {
         self.subscription_repository.create_subscription(SubscriptionEntity::from(subscription)).await
     }
 
+    async fn find_many_subscriptions(&self, project: &str, topic: &str) -> Result<Vec<Subscription>, ServiceError> {
+        let subscriptions = self.subscription_repository.find_many_subscriptions(project, topic)
+            .await?;
+
+        let d: Vec<Subscription> = subscriptions.into_iter()
+            .map(|entity| Subscription::from(entity) )
+            .collect();
+
+        Ok(d)
+
+    }
 }

@@ -365,6 +365,7 @@ dependencies = [
  "ahash",
  "base64 0.13.1",
  "bitvec",
+ "chrono",
  "hex",
  "indexmap 2.6.0",
  "js-sys",
@@ -429,8 +430,10 @@ checksum = "a21f936df1771bf62b77f047b726c4625ff2e8aa607c01ec06e5a05bd8463401"
 dependencies = [
  "android-tzdata",
  "iana-time-zone",
+ "js-sys",
  "num-traits",
  "serde",
+ "wasm-bindgen",
  "windows-targets 0.52.6",
 ]
 
@@ -1628,10 +1631,14 @@ version = "0.1.0"
 dependencies = [
  "actix-web",
  "async-trait",
+ "bson",
+ "chrono",
  "futures",
  "mongodb",
  "serde",
+ "serde_json",
  "tokio",
+ "uuid",
 ]
 
 [[package]]

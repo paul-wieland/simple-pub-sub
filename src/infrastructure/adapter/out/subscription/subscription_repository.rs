@@ -1,7 +1,9 @@
 use std::error::Error;
+use futures::TryStreamExt;
 use mongodb::bson::doc;
 use mongodb::Collection;
 use crate::domain::model::service_error::ServiceError;
+use crate::domain::model::service_error::ServiceError::InternalServerError;
 use crate::infrastructure::adapter::config::mongo_db_client::MongoDbClient;
 use crate::infrastructure::adapter::out::subscription::subscription_entity::SubscriptionEntity;
 
@@ -41,6 +43,21 @@ impl SubscriptionRepository{
         self.collection::<SubscriptionEntity>().find_one(filter)
             .await
             .map_err(|_| format!("Error: could not query find_one with project {} and topic {}", project, topic).into())
+    }
+
+    pub async fn find_many_subscriptions(&self, project: &str, topic: &str) -> Result<Vec<SubscriptionEntity>, ServiceError>{
+        let filter = doc! { "project": project, "topic": topic};
+
+        let cursor =  self.collection::<SubscriptionEntity>().find(filter)
+            .await.map_err(|_| InternalServerError)?;
+
+        let results: Vec<SubscriptionEntity> = cursor.try_collect().await
+            .map_err(|_| InternalServerError)?;
+
+        Ok(results)
+
+            // .map(|r| { r.try_collect() })
+            // .map_err(|_| ServiceError::InternalServerError)
     }
 
 }
