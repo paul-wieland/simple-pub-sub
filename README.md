@@ -2,7 +2,7 @@
 
 ## HTTP Endpoints
 
-***Simple Pub Sub*** provides HTTP endpoints for creating projects, topics and messages.
+***Simple Pub Sub*** provides HTTP endpoints for creating topics, subscriptions and messages.
 It's also possible to consume messages.
 The HTTP endpoints are mainly for development and debugging purpose as well as for a future ***Simple Pub Sub Dashboard***.
 
