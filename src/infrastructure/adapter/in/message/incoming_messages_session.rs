@@ -1,12 +1,27 @@
 use std::sync::Arc;
+use actix_web::body::MessageBody;
 use chrono::Utc;
-use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
-use tokio::net::TcpStream;
+use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader, WriteHalf};
 use uuid::Uuid;
 use log::{debug, error, info};
+use serde::Serialize;
+use tokio::net::TcpStream;
 use crate::domain::model::pub_sub_message::PubSubMessage;
 use crate::domain::usecase::create_message_use_case::CreateMessageUseCase;
 use crate::infrastructure::adapter::r#in::message::message_dto::{MessageRequestDto, ProjectTopicInitDto};
+
+#[derive(Debug, Serialize)]
+enum SessionStatus{
+    Ok,
+    Error
+}
+
+#[derive(Debug, Serialize)]
+struct SessionResponse{
+    status: SessionStatus,
+    session_id: String,
+    message: String
+}
 
 pub struct IncomingMessagesSession {
     session_id: String,
@@ -23,19 +38,32 @@ impl IncomingMessagesSession {
     }
 
     pub async fn start(&mut self) {
-        info!("[Session {}] Session started", &self.session_id);
         // Split socket in read and write part
         let (split_reader, mut split_writer) = self.tcp_stream.split();
-        // TODO: send session started message to client
-        let mut reader = BufReader::new(split_reader);
 
+        /*
+            Log and send session started to client
+         */
+        info!("[Session {}] Session has started", &self.session_id.clone());
+        let r = SessionResponse{
+            status: SessionStatus::Ok,
+            session_id: self.session_id.to_string(),
+            message: "Session has started".into(),
+        };
+        let session_started_message = serde_json::to_string(&r).unwrap() + "\n";
+        split_writer.write_all(session_started_message.as_bytes()).await.expect("");
+
+
+        /*
+            Prepare receiving messages
+         */
+        let mut reader = BufReader::new(split_reader);
         let mut is_initialized = false;
         let mut project: Option<String> = None;
         let mut topic: Option<String> = None;
 
         loop {
             let mut buffer = String::new();
-            // Always read a whole line until \n
             match reader.read_line(&mut buffer).await{
                 Ok(_) => {  }
                 Err(_) => {

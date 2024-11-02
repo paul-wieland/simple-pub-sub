@@ -1,5 +1,19 @@
 # Simple Pub Sub
 
+## Connect as Message Publisher
+
+***Simple Pub Sub*** publishers open a TCP connection on ```127.0.0.1:8060``` to publish messages.
+The session must be initialized by the client providing ***project*** and ***topic***. After that, the publisher can send 
+messages using the session. These steps are described with the following code snippets using ***netcat***.
+
+```
+$ nc 127.0.0.1 8060
+>> {"status":"Ok","session_id":"15472de3-d0af-40fe-afb5-0b9d0e76d4ff","message":"Session has started"}
+$ {"project": "my-project", "topic": "my-topic"}
+>> 
+$ {"data": "my-data"}
+```
+
 ## HTTP Endpoints
 
 ***Simple Pub Sub*** provides HTTP endpoints for creating topics, subscriptions and messages.
