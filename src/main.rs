@@ -24,7 +24,7 @@ async fn main() -> Result<(), Box<dyn Error>>{
 
     let incoming_messages_listener = tokio::spawn(async {
         IncomingMessagesListener::new(create_message_use_case)
-            .start("127.0.0.1:8090")
+            .start("127.0.0.1:8060")
             .await
             .expect("");
     });
