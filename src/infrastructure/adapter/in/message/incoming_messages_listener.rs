@@ -1,5 +1,6 @@
 use std::error::Error;
 use std::sync::Arc;
+use log::info;
 use tokio::net::{TcpListener};
 use tokio::task;
 use crate::domain::usecase::create_message_use_case::CreateMessageUseCase;
@@ -17,7 +18,7 @@ impl IncomingMessagesListener {
 
     pub async fn start(&self, address: &str) -> Result<(), Box<dyn Error>>{
         let listener = TcpListener::bind(address).await?;
-        println!("Server is listening on {}", address);
+        info!("Message Listener for Publishers is active on {}", address);
 
         loop{
             let (tcp_stream, _) = listener.accept().await?;
