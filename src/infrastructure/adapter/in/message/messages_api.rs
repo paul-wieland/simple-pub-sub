@@ -40,14 +40,4 @@ pub async fn create_message(
     match use_case.create_message(pub_sub_message).await {
         _ => { HttpResponse::Created() }
     }
-
-    // match use_case.create_subscription(subscription).await{
-    //     Ok(_) => { HttpResponse::Created().finish() }
-    //     Err(ServiceError::ResourceNotExists(message)) => { HttpResponse::BadRequest().json(message) }
-    //     Err(ServiceError::ResourceExists) => { HttpResponse::Conflict()
-    //         .json(format!("Subscription `{}` already exists in project `{}` and topic `{}`",
-    //                       subscription_dto.subscription, subscription_path.project, subscription_path.topic))
-    //     }
-    //     _ => { HttpResponse::InternalServerError().finish() }
-    // }
 }
