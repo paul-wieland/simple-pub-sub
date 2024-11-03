@@ -6,6 +6,7 @@ use std::{env};
 use std::sync::Arc;
 use crate::domain::usecase::create_message_use_case::CreateMessageUseCase;
 use crate::infrastructure::adapter::out::message::persistence::message_persistence_adapter::MessagePersistenceAdapter;
+use crate::infrastructure::adapter::out::message::server::message_created_notification_adapter::MessageCreatedNotificationAdapter;
 use crate::infrastructure::adapter::out::message::server::subscriber_server::SubscriberServer;
 use crate::infrastructure::adapter::out::subscription::subscription_persistence_adapter::SubscriptionPersistenceAdapter;
 use crate::infrastructure::adapter::r#in::message::publisher_server::PublisherServer;
@@ -16,6 +17,9 @@ async fn main() -> Result<(), Box<dyn Error>>{
     setup_logger();
 
     // TODO: add broadcast channel to Create Message Use Case to notify consumers -> Sender
+    let message_notification_adapter = Arc::new(
+        MessageCreatedNotificationAdapter::new()
+    );
 
     /**
         Publisher Server
@@ -23,7 +27,8 @@ async fn main() -> Result<(), Box<dyn Error>>{
     let create_message_use_case = Arc::new(
         CreateMessageUseCase::new(
             Box::new(MessagePersistenceAdapter::new().await?),
-            Box::new(SubscriptionPersistenceAdapter::new().await?)
+            Box::new(SubscriptionPersistenceAdapter::new().await?),
+            Arc::clone(&message_notification_adapter)
         )
     );
 
@@ -38,7 +43,7 @@ async fn main() -> Result<(), Box<dyn Error>>{
         Subscriber Server
     */
     let subscriber_server = tokio::spawn( async {
-        SubscriberServer::new()
+        SubscriberServer::new(message_notification_adapter)
             .start("127.0.0.1:8070")
             .await
             .expect("")

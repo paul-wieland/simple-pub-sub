@@ -7,7 +7,7 @@ use crate::domain::usecase::create_message_use_case::CreateMessageUseCase;
 use crate::infrastructure::adapter::r#in::message::publisher_session_handler::PublisherSessionHandler;
 
 pub struct PublisherServer {
-    create_message_use_case: Arc<CreateMessageUseCase>
+    create_message_use_case: Arc<CreateMessageUseCase>,
 }
 
 impl PublisherServer {

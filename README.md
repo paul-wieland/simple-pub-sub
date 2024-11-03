@@ -33,6 +33,39 @@ $ {"data": "my-data"}
 
 ## Connect as Message Subscriber
 
+```
+$ nc 127.0.0.1 8060
+
+>> {
+"status":"SubscriberSessionStarted",
+"session_id":"aa702172-8b3e-4486-a09b-655e62e33726",
+"message":"Session has started"
+}
+
+$ {
+"project": "my-project", 
+"topic": "my-topic", 
+"subscription": "my-subscription"
+}
+
+>> {
+"status":"SubscriberSessionInitialized",
+"session_id":"aa702172-8b3e-4486-a09b-655e62e33726",
+"message":"Initialized session with project my-project and topic my-topic and subscription my-subscription"
+}
+
+>> {
+"project":"my-project",
+"topic":"my-topic",
+"subscription":"my-subscription",
+"message_id":"56380ac2-aeff-4f36-9f85-314d8127b784",
+"data":"my-data",
+"publish_time":"2024-11-03T13:29:28.304022Z",
+"attributes":null,
+"acknowledged":false
+}
+```
+
 ## HTTP Endpoints
 
 ***Simple Pub Sub*** provides HTTP endpoints for creating topics, subscriptions and messages.
