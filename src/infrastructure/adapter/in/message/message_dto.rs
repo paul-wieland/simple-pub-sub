@@ -9,6 +9,12 @@ pub struct MessageRequestDto {
         pub attributes: Option<HashMap<String, Value>>,
 }
 
+#[derive(Deserialize)]
+pub struct ProjectTopicInitDto {
+        pub project: String,
+        pub topic: String,
+}
+
 #[derive(Serialize)]
 pub struct MessageResponseDto {
         pub data: String,
