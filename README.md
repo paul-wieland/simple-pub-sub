@@ -8,10 +8,27 @@ messages using the session. These steps are described with the following code sn
 
 ```
 $ nc 127.0.0.1 8060
->> {"status":"Ok","session_id":"15472de3-d0af-40fe-afb5-0b9d0e76d4ff","message":"Session has started"}
+
+>> {
+"status":"SessionStarted",
+"session_id":"9c833704-1596-446e-840f-b8275e06f49a",
+"message":"Session has started"}
+
 $ {"project": "my-project", "topic": "my-topic"}
->> 
+
+>> {
+"status":"SessionInitialized",
+"session_id":"9c833704-1596-446e-840f-b8275e06f49a",
+"message":"Initialized session with project my-project and topic my-topic"
+}
+
 $ {"data": "my-data"}
+
+>> {
+"status":"SessionMessagePublished",
+"session_id":"9c833704-1596-446e-840f-b8275e06f49a",
+"message":"Successfully published message"
+}
 ```
 
 ## HTTP Endpoints
