@@ -4,7 +4,7 @@ use log::info;
 use tokio::net::{TcpListener};
 use tokio::task;
 use crate::domain::usecase::create_message_use_case::CreateMessageUseCase;
-use crate::infrastructure::adapter::r#in::message::publisher_session_handler::PublsiherSessionHandler;
+use crate::infrastructure::adapter::r#in::message::publisher_session_handler::PublisherSessionHandler;
 
 pub struct PublisherServer {
     create_message_use_case: Arc<CreateMessageUseCase>
@@ -24,7 +24,7 @@ impl PublisherServer {
             let (tcp_stream, _) = listener.accept().await?;
             let cloned_use_case = Arc::clone(&self.create_message_use_case);
             task::spawn( async move {
-                PublsiherSessionHandler::new(tcp_stream, cloned_use_case).start().await;
+                PublisherSessionHandler::new(tcp_stream, cloned_use_case).start().await;
             });
         }
     }
