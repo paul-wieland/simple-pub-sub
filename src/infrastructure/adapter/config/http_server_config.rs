@@ -4,7 +4,7 @@ use actix_web::{App, HttpServer, web};
 use crate::domain::usecase::create_message_use_case::CreateMessageUseCase;
 use crate::domain::usecase::create_subscription_use_case::CreateSubscriptionUseCase;
 use crate::domain::usecase::create_topic_use_case::CreateTopicUseCase;
-use crate::infrastructure::adapter::out::message::message_persistence_adapter::MessagePersistenceAdapter;
+use crate::infrastructure::adapter::out::message::persistence::message_persistence_adapter::MessagePersistenceAdapter;
 use crate::infrastructure::adapter::out::subscription::subscription_persistence_adapter::SubscriptionPersistenceAdapter;
 use crate::infrastructure::adapter::out::topic::topic_persistence_adapter::TopicPersistenceAdapter;
 use crate::infrastructure::adapter::r#in::message::messages_api::create_message;

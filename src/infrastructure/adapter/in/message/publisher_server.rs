@@ -18,7 +18,7 @@ impl PublisherServer {
 
     pub async fn start(&self, address: &str) -> Result<(), Box<dyn Error>>{
         let listener = TcpListener::bind(address).await?;
-        info!("Message Listener for Publishers is active on {}", address);
+        info!("Publisher server is active on {}", address);
 
         loop{
             let (tcp_stream, _) = listener.accept().await?;
