@@ -2,7 +2,7 @@
 
 ## Connect as Message Publisher
 
-***Simple Pub Sub*** publishers open a TCP connection on ```127.0.0.1:8060``` to publish messages.
+***Simple Pub Sub*** publishers open a TCP connection port ```8060``` to publish messages.
 The session must be initialized by the client providing ***project*** and ***topic***. After that, the publisher can send 
 messages using the session. These steps are described with the following code snippets using ***netcat***.
 
@@ -32,6 +32,10 @@ $ {"data": "my-data"}
 ```
 
 ## Connect as Message Subscriber
+
+***Simple Pub Sub*** subscribers open a TCP connection o port ```8070``` to receive messages.
+After the session has started, the client must provide ***project***, ***topic*** and ***subscription*** to receive messages.
+The client can then listen for messages to arrive.
 
 ```
 $ nc 127.0.0.1 8060
