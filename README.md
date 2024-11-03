@@ -31,6 +31,8 @@ $ {"data": "my-data"}
 }
 ```
 
+## Connect as Message Subscriber
+
 ## HTTP Endpoints
 
 ***Simple Pub Sub*** provides HTTP endpoints for creating topics, subscriptions and messages.
@@ -69,6 +71,14 @@ curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/me
     }
 }'
 ```
+
+### Architecture Overview
+
+## Message Publisher and Subscriber Flow
+
+<p align="center">
+<img src="/drawing/architecture.png" alt=""/>
+</p>
 
 https://chesedo.me/blog/manual-dependency-injection-rust/
 
