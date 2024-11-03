@@ -72,7 +72,7 @@ curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/me
 }'
 ```
 
-### Architecture Overview
+# Architecture Overview
 
 ## Message Publisher and Subscriber Flow
 
