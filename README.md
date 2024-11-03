@@ -38,7 +38,7 @@ After the session has started, the client must provide ***project***, ***topic**
 The client can then listen for messages to arrive.
 
 ```
-$ nc 127.0.0.1 8060
+$ nc 127.0.0.1 8070
 
 >> {
 "status":"SubscriberSessionStarted",
