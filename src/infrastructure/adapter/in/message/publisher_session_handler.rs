@@ -1,5 +1,6 @@
 use std::sync::Arc;
 use actix_web::body::MessageBody;
+use actix_web::cookie::Expiration::Session;
 use chrono::Utc;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader, WriteHalf};
 use uuid::Uuid;
@@ -12,8 +13,11 @@ use crate::infrastructure::adapter::r#in::message::message_dto::{MessageRequestD
 
 #[derive(Debug, Serialize)]
 enum SessionStatus{
-    Ok,
-    Error
+    SessionStarted,
+    SessionInitialized,
+    SessionClosed,
+    SessionMessagePublished,
+    SessionMessagePublishedError
 }
 
 #[derive(Debug, Serialize)]
@@ -46,7 +50,7 @@ impl PublisherSessionHandler {
          */
         info!("[Session {}] Session has started", &self.session_id.clone());
         let r = SessionResponse{
-            status: SessionStatus::Ok,
+            status: SessionStatus::SessionStarted,
             session_id: self.session_id.to_string(),
             message: "Session has started".into(),
         };
@@ -73,31 +77,60 @@ impl PublisherSessionHandler {
             }
 
             if !is_initialized {
+                /*
+                    Initialize Session
+                 */
                 match serde_json::from_str::<ProjectTopicInitDto>(buffer.trim()){
                     Ok(project_topic_init_dto) => {
-                        is_initialized = true;
+                        // Initialize the session. TODO: Verify project and topic exists
                         project = Some(project_topic_init_dto.project);
                         topic = Some(project_topic_init_dto.topic);
+                        is_initialized = true;
 
-                        let message = format!(
+                        // Send initialized message to client
+                        let client_message = SessionResponse{
+                            status: SessionStatus::SessionInitialized,
+                            session_id: self.session_id.clone(),
+                            message: format!("Initialized session with project {} and topic {}",
+                                             project.clone().unwrap(),
+                                             topic.clone().unwrap()),
+                        };
+                        let client_message_raw = serde_json::to_string(&client_message).unwrap() + "\n";
+                        split_writer.write_all(client_message_raw.as_bytes()).await.expect("");
+
+                        // Log initialized message
+                        let log_message = format!(
                             "[Session {}] Initialized session with project {} and topic {}",
                             &self.session_id,
                             project.clone().unwrap(),
                             topic.clone().unwrap());
-                        // TODO: send formatted session initialized message to client
-                        info!("{}", message)
+                        info!("{}", log_message)
                     }
+                    /*
+                        Handle Session Initialization Error
+                     */
                     Err(_) => {
-                        let message = format!("[Session {}] Could not initialize session. Closing connection", &self.session_id);
-                        // TODO: send formatted session closed message to client
-                        split_writer.write_all(message.as_bytes()).await.expect("");
+                        let error_response = SessionResponse{
+                            status: SessionStatus::SessionClosed,
+                            session_id: self.session_id.clone(),
+                            message: "Could not initialize session. Closing connection".to_string(),
+                        };
+                        // Write error message to client
+                        let error_response = serde_json::to_string(&error_response).unwrap() + "\n";
+                        split_writer.write_all(error_response.as_bytes()).await.expect("");
+                        // Log error message
+                        let error_log = format!("[Session {}] Could not initialize session. Closing connection", &self.session_id);
+                        error!("{}" ,error_log);
+                        // Close connection and session
                         self.tcp_stream.shutdown().await.expect("");
-                        error!("{}" ,message);
                         break
                     }
                 }
 
             }else{
+                /*
+                    Handle Message flow after initialization
+                 */
                 match serde_json::from_str::<MessageRequestDto>(buffer.trim()){
                     Ok(message_request) => {
                         let pub_sub_message = PubSubMessage{
@@ -112,17 +145,51 @@ impl PublisherSessionHandler {
                         };
                         match self.create_message_use_case.create_message(pub_sub_message).await{
                             Ok(_) => {
+                                let published_response = SessionResponse{
+                                    status: SessionStatus::SessionMessagePublished,
+                                    session_id: self.session_id.clone(),
+                                    message: "Successfully published message".to_string(),
+                                };
+                                // Write error message to client
+                                let response = serde_json::to_string(&published_response).unwrap() + "\n";
+                                split_writer.write_all(response.as_bytes()).await.expect("");
+                                // Log message
                                 let message = format!("[Session {}] Successfully published message", &self.session_id);
                                 info!("{}", &message)
-                                // TODO: Send publish success to client
                             }
                             Err(_) => {
-                                // TODO: Send publish message error to client
+                                let published_response = SessionResponse{
+                                    status: SessionStatus::SessionMessagePublishedError,
+                                    session_id: self.session_id.clone(),
+                                    message: "Could not publish message. Internal Error".to_string(),
+                                };
+                                // Write error message to client
+                                let response = serde_json::to_string(&published_response).unwrap() + "\n";
+                                split_writer.write_all(response.as_bytes()).await.expect("");
+                                // Log message
+                                let message = format!("[Session {}] Could not publish message. Internal Error", &self.session_id);
+                                info!("{}", &message)
                             }
                         };
                     }
+                    /*
+                        Handle message deserialization exception
+                     */
                     Err(_) => {
-                        // TODO: Send deserialization error to client
+                        let error_response = SessionResponse{
+                            status: SessionStatus::SessionClosed,
+                            session_id: self.session_id.clone(),
+                            message: "Could not deserialize message. Closing connection".to_string(),
+                        };
+                        // Write error message to client
+                        let error_response = serde_json::to_string(&error_response).unwrap() + "\n";
+                        split_writer.write_all(error_response.as_bytes()).await.expect("");
+                        // Log error message
+                        let error_log = format!("[Session {}] Could not deserialize message. Closing session", &self.session_id);
+                        error!("{}" ,error_log);
+                        // Close connection and session
+                        self.tcp_stream.shutdown().await.expect("");
+                        break
                     }
                 }
             }
