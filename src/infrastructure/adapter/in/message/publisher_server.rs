@@ -4,13 +4,13 @@ use log::info;
 use tokio::net::{TcpListener};
 use tokio::task;
 use crate::domain::usecase::create_message_use_case::CreateMessageUseCase;
-use crate::infrastructure::adapter::r#in::message::incoming_messages_session::IncomingMessagesSession;
+use crate::infrastructure::adapter::r#in::message::publisher_session_handler::PublsiherSessionHandler;
 
-pub struct IncomingMessagesListener {
+pub struct PublisherServer {
     create_message_use_case: Arc<CreateMessageUseCase>
 }
 
-impl IncomingMessagesListener {
+impl PublisherServer {
 
     pub fn new(create_message_use_case: Arc<CreateMessageUseCase>) -> Self{
         Self { create_message_use_case }
@@ -24,7 +24,7 @@ impl IncomingMessagesListener {
             let (tcp_stream, _) = listener.accept().await?;
             let cloned_use_case = Arc::clone(&self.create_message_use_case);
             task::spawn( async move {
-                IncomingMessagesSession::new(tcp_stream, cloned_use_case).start().await;
+                PublsiherSessionHandler::new(tcp_stream, cloned_use_case).start().await;
             });
         }
     }

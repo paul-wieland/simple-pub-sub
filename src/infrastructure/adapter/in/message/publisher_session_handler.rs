@@ -23,13 +23,13 @@ struct SessionResponse{
     message: String
 }
 
-pub struct IncomingMessagesSession {
+pub struct PublsiherSessionHandler {
     session_id: String,
     tcp_stream: TcpStream,
     create_message_use_case: Arc<CreateMessageUseCase>
 }
 
-impl IncomingMessagesSession {
+impl PublsiherSessionHandler {
 
     pub fn new(tcp_stream: TcpStream, create_message_use_case: Arc<CreateMessageUseCase>) -> Self{
         let session_id = Uuid::new_v4().to_string();

@@ -7,7 +7,7 @@ use std::sync::Arc;
 use crate::domain::usecase::create_message_use_case::CreateMessageUseCase;
 use crate::infrastructure::adapter::out::message::message_persistence_adapter::MessagePersistenceAdapter;
 use crate::infrastructure::adapter::out::subscription::subscription_persistence_adapter::SubscriptionPersistenceAdapter;
-use crate::infrastructure::adapter::r#in::message::incoming_messages_listener::IncomingMessagesListener;
+use crate::infrastructure::adapter::r#in::message::publisher_server::PublisherServer;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>>{
@@ -23,7 +23,7 @@ async fn main() -> Result<(), Box<dyn Error>>{
     );
 
     let incoming_messages_listener = tokio::spawn(async {
-        IncomingMessagesListener::new(create_message_use_case)
+        PublisherServer::new(create_message_use_case)
             .start("127.0.0.1:8060")
             .await
             .expect("");
