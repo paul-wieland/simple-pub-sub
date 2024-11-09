@@ -7,7 +7,7 @@ use crate::domain::usecase::create_message_use_case::CreateMessageUseCase;
 use crate::infrastructure::adapter::r#in::message::publisher_session_handler::PublisherSessionHandler;
 
 pub struct PublisherServer {
-    create_message_use_case: Arc<CreateMessageUseCase>
+    create_message_use_case: Arc<CreateMessageUseCase>,
 }
 
 impl PublisherServer {
@@ -18,7 +18,7 @@ impl PublisherServer {
 
     pub async fn start(&self, address: &str) -> Result<(), Box<dyn Error>>{
         let listener = TcpListener::bind(address).await?;
-        info!("Message Listener for Publishers is active on {}", address);
+        info!("Publisher server is active on {}", address);
 
         loop{
             let (tcp_stream, _) = listener.accept().await?;

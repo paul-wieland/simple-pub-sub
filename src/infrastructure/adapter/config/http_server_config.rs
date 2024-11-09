@@ -4,7 +4,8 @@ use actix_web::{App, HttpServer, web};
 use crate::domain::usecase::create_message_use_case::CreateMessageUseCase;
 use crate::domain::usecase::create_subscription_use_case::CreateSubscriptionUseCase;
 use crate::domain::usecase::create_topic_use_case::CreateTopicUseCase;
-use crate::infrastructure::adapter::out::message::message_persistence_adapter::MessagePersistenceAdapter;
+use crate::infrastructure::adapter::out::message::persistence::message_persistence_adapter::MessagePersistenceAdapter;
+use crate::infrastructure::adapter::out::message::server::message_created_notification_adapter::MessageCreatedNotificationAdapter;
 use crate::infrastructure::adapter::out::subscription::subscription_persistence_adapter::SubscriptionPersistenceAdapter;
 use crate::infrastructure::adapter::out::topic::topic_persistence_adapter::TopicPersistenceAdapter;
 use crate::infrastructure::adapter::r#in::message::messages_api::create_message;
@@ -18,6 +19,10 @@ pub struct HttpServerConfig{
 impl HttpServerConfig{
 
     pub async fn run() -> Result<(), Box<dyn Error>> {
+
+        let message_notification_adapter = Arc::new(
+            MessageCreatedNotificationAdapter::new()
+        );
 
         // Setup Topic UseCase
 
@@ -39,7 +44,8 @@ impl HttpServerConfig{
         let create_message_use_case = Arc::new(
             CreateMessageUseCase::new(
                 Box::new(MessagePersistenceAdapter::new().await?),
-                Box::new(SubscriptionPersistenceAdapter::new().await?)
+                Box::new(SubscriptionPersistenceAdapter::new().await?),
+                message_notification_adapter
             )
         );
 

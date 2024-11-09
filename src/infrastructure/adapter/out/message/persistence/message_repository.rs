@@ -2,7 +2,7 @@ use std::error::Error;
 use mongodb::Collection;
 use crate::domain::model::service_error::ServiceError;
 use crate::infrastructure::adapter::config::mongo_db_client::MongoDbClient;
-use crate::infrastructure::adapter::out::message::message_entity::MessageEntity;
+use crate::infrastructure::adapter::out::message::persistence::message_entity::MessageEntity;
 
 pub struct MessageRepository{
     mongodb_client: MongoDbClient,
