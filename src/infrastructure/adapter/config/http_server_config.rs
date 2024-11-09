@@ -13,59 +13,49 @@ use crate::infrastructure::adapter::r#in::subscription::subscription_api::create
 use crate::infrastructure::adapter::r#in::topic::topic_api::create_topic;
 
 pub struct HttpServerConfig{
-
+    create_topic_use_case: Arc<CreateTopicUseCase>,
+    create_subscription_use_case: Arc<CreateSubscriptionUseCase>,
+    create_message_use_case: Arc<CreateMessageUseCase>,
 }
 
 impl HttpServerConfig{
 
-    pub async fn run() -> Result<(), Box<dyn Error>> {
+    pub fn new(
+        create_topic_use_case: Arc<CreateTopicUseCase>,
+        create_subscription_use_case: Arc<CreateSubscriptionUseCase>,
+        create_message_use_case: Arc<CreateMessageUseCase>
+    ) -> Self{
+        Self {
+            create_topic_use_case,
+            create_subscription_use_case,
+            create_message_use_case
+        }
+    }
 
-        let message_notification_adapter = Arc::new(
-            MessageCreatedNotificationAdapter::new()
-        );
+    pub async fn start(&self, address: &str) {
 
-        // Setup Topic UseCase
+        let topic_use_case = self.create_topic_use_case.clone();
+        let subscription_use_case = self.create_subscription_use_case.clone();
+        let message_use_case = self.create_message_use_case.clone();
 
-        let create_topic_use_case =
-            Arc::new(
-                CreateTopicUseCase::new(
-                    Box::new(TopicPersistenceAdapter::new().await?)));
-
-        // Setup Subscription UseCase
-        let create_subscription_use_case =
-            Arc::new(
-                CreateSubscriptionUseCase::new(
-                    Box::new(SubscriptionPersistenceAdapter::new().await?),
-                    Box::new(TopicPersistenceAdapter::new().await?)
-                )
-            );
-
-        // Setup Message UseCase
-        let create_message_use_case = Arc::new(
-            CreateMessageUseCase::new(
-                Box::new(MessagePersistenceAdapter::new().await?),
-                Box::new(SubscriptionPersistenceAdapter::new().await?),
-                message_notification_adapter
-            )
-        );
-
-        HttpServer::new(move || {
+        match HttpServer::new( move || {
             App::new()
                 // Topic
-                .app_data(web::Data::new(create_topic_use_case.clone()))
+                .app_data(web::Data::new(topic_use_case.clone()))
                 .service(create_topic)
                 // Subscription
-                .app_data(web::Data::new(create_subscription_use_case.clone()))
+                .app_data(web::Data::new(subscription_use_case.clone()))
                 .service(create_subscription)
                 // Message
-                .app_data(web::Data::new(create_message_use_case.clone()))
+                .app_data(web::Data::new(message_use_case.clone()))
                 .service(create_message)
         })
-            .bind(("127.0.0.1", 8080))?
+            .bind(address).unwrap_or_else(|_| { panic!("Could not start http server") })
             .run()
-            .await
-            .map(|_| ())
-            .map_err(|_| "Error when executing HTTP server".into())
+            .await{
+            Ok(_) => {}
+            Err(_) => {}
+        }
     }
 
 }
