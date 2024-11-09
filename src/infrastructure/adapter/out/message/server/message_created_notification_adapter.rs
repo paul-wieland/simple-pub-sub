@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 use chrono::{DateTime, Utc};
-use log::info;
+use log::{debug, info};
 use serde::Serialize;
 use serde_json::Value;
 use tokio::sync::Mutex;
 use crate::domain::model::pub_sub_message::PubSubMessage;
-use crate::infrastructure::adapter::out::message::server::subscriber::Subscriber;
+use crate::infrastructure::adapter::out::message::server::subscriber::{Subscriber, Subscribers, SubscriptionData};
 
 type ProjectTopicSubscription = String;
 
@@ -23,7 +23,7 @@ pub struct MessageResponseDto {
 
 
 pub struct MessageCreatedNotificationAdapter{
-    channels: Mutex<HashMap<ProjectTopicSubscription, Vec<Subscriber>>>,
+    channels: Mutex<HashMap<ProjectTopicSubscription, Subscribers>>,
 }
 
 impl MessageCreatedNotificationAdapter{
@@ -34,18 +34,31 @@ impl MessageCreatedNotificationAdapter{
 
     pub async fn register(&self, subscriber: Subscriber) {
         let mut channels = self.channels.lock().await;
-        println!("Register subscriber {}", &subscriber.project_topic_subscription);
 
-        match channels.get(&subscriber.project_topic_subscription){
+        match channels.get_mut(&subscriber.subscription_data.full_subscription_key()){
             None => {
-                let mut vec = Vec::new();
-                let id = subscriber.project_topic_subscription.clone();
-                vec.push(subscriber);
-                info!("Inserted {}", &id);
-                channels.insert(id, vec);
+                let subscriber_group = subscriber.subscription_data.full_subscription_key();
+                let mut subscribers = Subscribers::new();
+                subscribers.add_subscriber(subscriber);
+                channels.insert(subscriber_group, subscribers);
             }
-            Some(_) => {
-                info!("Found something")
+            Some(subscribers) => {
+                subscribers.add_subscriber(subscriber);
+            }
+        }
+    }
+
+    pub async fn deregister(&self, subscription_data: Option<SubscriptionData>, session_id: &str){
+
+        if let None = subscription_data{
+            return
+        }
+
+        let mut channels = self.channels.lock().await;
+        match channels.get_mut(&subscription_data.unwrap().full_subscription_key()){
+            None => { }
+            Some(subscribers) => {
+                subscribers.remove_subscriber(session_id)
             }
         }
     }
@@ -53,17 +66,21 @@ impl MessageCreatedNotificationAdapter{
     pub async fn publish_message(&self, pub_sub_message: PubSubMessage){
         let mut channels = self.channels.lock().await;
 
-        let project = pub_sub_message.project.clone();
-        let topic = pub_sub_message.topic.clone();
-        let subscription = pub_sub_message.subscription.clone().unwrap();
-        let key = format!("{}_{}_{}", project, topic, subscription);
+        let subscription_data = SubscriptionData{
+            project: pub_sub_message.project.clone(),
+            topic: pub_sub_message.topic.clone(),
+            subscription: pub_sub_message.subscription.clone().unwrap(),
+        };
 
-        match channels.get(&key){
+
+        let full_subscription_key = subscription_data.full_subscription_key();
+
+        match channels.get_mut(&full_subscription_key){
             None => {
-                info!("no subscriber found")
+                debug!("No subscribers found for {}", &full_subscription_key)
             }
-            Some(subscribers) => {
-
+            Some(mut subscribers) => {
+                debug!("Found subscribers for {}", &full_subscription_key);
                 let response = MessageResponseDto{
                     project: pub_sub_message.project,
                     topic: pub_sub_message.topic,
@@ -74,8 +91,7 @@ impl MessageCreatedNotificationAdapter{
                     attributes: pub_sub_message.attributes,
                     acknowledged: pub_sub_message.acknowledged,
                 };
-
-                subscribers.first().unwrap().sender.send(response).await.expect("");
+                subscribers.send_message(response).await;
             }
         }
     }
