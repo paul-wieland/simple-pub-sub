@@ -1,4 +1,5 @@
 use std::error::Error;
+use futures::{StreamExt, TryStreamExt};
 use mongodb::bson::doc;
 use mongodb::Collection;
 use crate::domain::model::service_error::ServiceError;
@@ -44,6 +45,20 @@ impl TopicRepository{
             .await
             .map(|entity| { entity.map(Topic::from) })
             .map_err(|_| format!("Error: could not query find_one with project {} and topic {}", project, topic).into())
+    }
+
+    pub async fn find_topics(&self, project: &str) -> Result<Vec<Topic>, ServiceError> {
+        let filter = doc! { "project": project};
+        let mut result_set: Vec<Topic> = Vec::new();
+
+        let mut cursor = self.collection::<TopicEntity>().find(filter)
+            .await
+            .map_err(|_| ServiceError::InternalServerError)?;
+
+        while let Some(entity) = cursor.try_next().await.map_err(|_| ServiceError::InternalServerError)?{
+            result_set.push(Topic::from(entity))
+        }
+        Ok(result_set)
     }
 
 }

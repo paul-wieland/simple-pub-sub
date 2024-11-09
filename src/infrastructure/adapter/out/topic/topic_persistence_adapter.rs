@@ -26,4 +26,8 @@ impl TopicPersistencePort for TopicPersistenceAdapter {
     async fn find_topic(&self, project: &str, topic: &str) -> Result<Option<Topic>, Box<dyn Error>> {
         self.topic_repository.find_topic(project, topic).await
     }
+
+    async fn find_topics(&self, project: &str) -> Result<Vec<Topic>, ServiceError> {
+        self.topic_repository.find_topics(project).await
+    }
 }
