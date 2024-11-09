@@ -1,19 +1,15 @@
-use std::error::Error;
-use std::fmt::format;
 use std::io;
 use std::sync::Arc;
 use log::{debug, error, info};
 use serde::{Deserialize, Serialize};
-use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader, split, ReadHalf, WriteHalf, AsyncReadExt};
+use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader, split, ReadHalf, WriteHalf};
 use tokio::net::TcpStream;
 use tokio::select;
 use tokio::sync::{mpsc, Mutex};
 use tokio::sync::mpsc::Sender;
 use uuid::Uuid;
-use crate::domain::model::topic::Topic;
 use crate::infrastructure::adapter::out::message::server::message_created_notification_adapter::{MessageCreatedNotificationAdapter, MessageResponseDto};
 use crate::infrastructure::adapter::out::message::server::subscriber::{Subscriber, SubscriptionData};
-use crate::infrastructure::adapter::r#in::message::message_dto::ProjectTopicInitDto;
 
 #[derive(Debug, Serialize)]
 enum SubscriberSessionStatus{
@@ -57,7 +53,6 @@ impl SubscriberSessionHandler{
 
     pub fn new(tcp_stream: TcpStream, message_created_notification_adapter: Arc<MessageCreatedNotificationAdapter>) -> Self{
         let session_id = Uuid::new_v4().to_string();
-        info!("[Session {}] Session created", &session_id);
         let (reader, writer) = split(tcp_stream);
         Self {
             reader: Arc::new(Mutex::new(BufReader::new(reader))),
@@ -105,9 +100,9 @@ impl SubscriberSessionHandler{
                 //--------------------------------------------------------------------------------
                 client_message = self.read_message_from_client(&mut buffer) => {
                     match client_message{
-                    Ok(_) => { println!("received client message") }
+                    Ok(_) => { println!("received client message: TODO") }
                     Err(_) => {
-                            error!("[Session {}] Session closed due to read line error", &self.session_id);
+                            self.log_error("Session closed due to read line error".to_string());
                             break
                         }
                     }
@@ -115,7 +110,7 @@ impl SubscriberSessionHandler{
                 //--------------------------------------------------------------------------------
             }
         }
-        info!("Destroying session {}", &self.session_id);
+        self.log_info("Closing session".to_string());
         self.message_created_notification_adapter.deregister(self.subscription_data.clone(), &self.session_id).await;
     }
 
@@ -160,13 +155,13 @@ impl SubscriberSessionHandler{
 
     async fn send_session_not_initialize(&self) -> Result<(), SubscriberHandlerError>{
 
-        let log_message = format!("[Session {}] Could not initialized session. Closing connection", &self.session_id);
-        info!("{}", log_message);
+        let message = "Could not initialized session. Closing connection".to_string();
+        self.log_info(message.clone());
 
         let message = SubscriberSessionResponse {
             status: SubscriberSessionStatus::SubscriberSessionClosed,
             session_id: self.session_id.clone(),
-            message: "Could not initialize session. Closing connection".to_string(),
+            message,
         };
 
         let message = serde_json::to_string(&message).unwrap() + "\n";
@@ -175,21 +170,16 @@ impl SubscriberSessionHandler{
 
     async fn send_session_initialize(&self, subscription_data: SubscriptionData) -> Result<(), SubscriberHandlerError>{
 
-        let log_message = format!(
-            "[Session {}] Initialized session with project {} and topic {} and subscription {}",
-            &self.session_id,
-            &subscription_data.project,
-            &subscription_data.topic,
-            &subscription_data.subscription);
-        info!("{}", log_message);
+        let message = format!("Initialized session with project {} and topic {} and subscription {}",
+                              &subscription_data.project,
+                              &subscription_data.topic,
+                              &subscription_data.subscription);
+        self.log_info(message.clone());
 
         let message = SubscriberSessionResponse {
             status: SubscriberSessionStatus::SubscriberSessionInitialized,
             session_id: self.session_id.clone(),
-            message: format!("Initialized session with project {} and topic {} and subscription {}",
-                             subscription_data.project,
-                             subscription_data.topic,
-                             subscription_data.subscription),
+            message
         };
         let message = serde_json::to_string(&message).unwrap() + "\n";
         self.send_message_to_client(message).await
@@ -200,11 +190,11 @@ impl SubscriberSessionHandler{
     */
     async fn send_session_started_message(&mut self) -> Result<(), SubscriberHandlerError>{
 
-        info!("[Session {}] Subscriber session has started", &self.session_id);
+        self.log_info("Subscriber session started".to_string());
         let r = SubscriberSessionResponse{
             status: SubscriberSessionStatus::SubscriberSessionStarted,
             session_id: self.session_id.clone(),
-            message: "Session has started".into(),
+            message: "Subscriber session started".into(),
         };
         let message = serde_json::to_string(&r).unwrap() + "\n";
         match self.send_message_to_client(message).await {
@@ -227,4 +217,17 @@ impl SubscriberSessionHandler{
         let mut reader = self.reader.lock().await;
         reader.read_line(buffer).await
     }
+
+    fn log_error(&self, message: String){
+        error!("[Session {}] {}", &self.session_id, message)
+    }
+
+    fn log_debug(&self, message: String){
+        debug!("[Session {}] {}", &self.session_id, message)
+    }
+
+    fn log_info(&self, message: String){
+        info!("[Session {}] {}", &self.session_id, message)
+    }
+
 }

@@ -1,4 +1,3 @@
-use futures::SinkExt;
 use log::debug;
 use tokio::sync::mpsc;
 use crate::infrastructure::adapter::out::message::server::message_created_notification_adapter::MessageResponseDto;
@@ -72,7 +71,7 @@ impl Subscriber{
     }
 
     pub async fn send_message(&self, message: MessageResponseDto){
-        &self.sender.send(message).await;
+        self.sender.send(message).await.expect("Could not send message");
     }
 
 }

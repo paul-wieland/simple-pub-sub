@@ -21,9 +21,6 @@ async fn main() -> Result<(), Box<dyn Error>>{
         MessageCreatedNotificationAdapter::new()
     );
 
-    /**
-        Publisher Server
-     */
     let create_message_use_case = Arc::new(
         CreateMessageUseCase::new(
             Box::new(MessagePersistenceAdapter::new().await?),
@@ -39,9 +36,6 @@ async fn main() -> Result<(), Box<dyn Error>>{
             .expect("");
     });
 
-    /**
-        Subscriber Server
-    */
     let subscriber_server = tokio::spawn( async {
         SubscriberServer::new(message_notification_adapter)
             .start("127.0.0.1:8070")

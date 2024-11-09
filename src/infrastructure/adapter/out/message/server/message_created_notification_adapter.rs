@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use chrono::{DateTime, Utc};
-use log::{debug, info};
+use log::{debug};
 use serde::Serialize;
 use serde_json::Value;
 use tokio::sync::Mutex;
@@ -79,7 +79,7 @@ impl MessageCreatedNotificationAdapter{
             None => {
                 debug!("No subscribers found for {}", &full_subscription_key)
             }
-            Some(mut subscribers) => {
+            Some(subscribers) => {
                 debug!("Found subscribers for {}", &full_subscription_key);
                 let response = MessageResponseDto{
                     project: pub_sub_message.project,

@@ -5,7 +5,6 @@ use tokio::net::TcpListener;
 use tokio::task;
 use crate::infrastructure::adapter::out::message::server::message_created_notification_adapter::MessageCreatedNotificationAdapter;
 use crate::infrastructure::adapter::out::message::server::subscriber_session_handler::SubscriberSessionHandler;
-use crate::infrastructure::adapter::r#in::message::publisher_session_handler::PublisherSessionHandler;
 
 pub struct SubscriberServer{
     message_created_notification_adapter: Arc<MessageCreatedNotificationAdapter>
