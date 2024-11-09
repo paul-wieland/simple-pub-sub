@@ -76,7 +76,7 @@ $ {
 
 ***Note: Use these endpoints to create topics and subscriptions before creating TCP connections.***
 
-### Create a topic
+### Create topic
 
 ```
 curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics' \
@@ -84,6 +84,12 @@ curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics' \
 --data '{
     "topic": "my-topic"
 }'
+```
+
+### Get topics
+
+```
+curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics'
 ```
 
 ### Create a subscription
