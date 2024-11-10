@@ -1,5 +1,6 @@
 # Simple Pub Sub
 
+-----
 ## Connect as Message Publisher
 
 ***Simple Pub Sub*** publishers open a TCP connection port ```8060``` to publish messages.
@@ -30,7 +31,7 @@ $ {"data": "my-data"}
 "message":"Successfully published message"
 }
 ```
-
+-----
 ## Connect as Message Subscriber
 
 ***Simple Pub Sub*** subscribers open a TCP connection o port ```8070``` to receive messages.
@@ -69,12 +70,15 @@ $ {
 "acknowledged":false
 }
 ```
+-----
 
 ## HTTP Endpoints
 
 ***Simple Pub Sub*** provides HTTP endpoints for creating topics, subscriptions and messages.
 
 ***Note: Use these endpoints to create topics and subscriptions before creating TCP connections.***
+
+-----
 
 ### Topics
 
@@ -94,6 +98,7 @@ curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics' \
 curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics'
 ```
 
+-----
 ### Subscriptions
 
 #### Create subscription
@@ -111,7 +116,7 @@ curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/su
 ```
 curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/subscriptions'
 ```
-
+-----
 ### Messages
 
 #### Publish a message
@@ -132,7 +137,7 @@ curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/me
 ```
 curl --location --request PATCH 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/messages/65a120d2-4d08-40b5-a7cf-8fe853d0a38f'
 ```
-
+-----
 # Architecture Overview
 
 <p align="center">
