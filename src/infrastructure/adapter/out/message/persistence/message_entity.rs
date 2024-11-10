@@ -14,7 +14,8 @@ pub struct MessageEntity{
     pub publish_time: BsonDateTime,
     pub attributes: Option<HashMap<String, Value>>,
     pub created: BsonDateTime,
-    pub acknowledged: bool
+    pub acknowledged: bool,
+    pub ack_time: Option<BsonDateTime>
 }
 
 impl From<PubSubMessage> for MessageEntity{
@@ -28,7 +29,8 @@ impl From<PubSubMessage> for MessageEntity{
             publish_time: BsonDateTime::from(value.publish_time),
             attributes: value.attributes,
             created: BsonDateTime::now(),
-            acknowledged: value.acknowledged
+            acknowledged: value.acknowledged,
+            ack_time: None
         }
     }
 }

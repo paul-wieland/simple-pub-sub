@@ -24,4 +24,8 @@ impl MessagePersistencePort for MessagePersistenceAdapter{
     async fn create_message(&self, message: PubSubMessage) -> Result<(), ServiceError> {
         self.message_repository.create_message(MessageEntity::from(message)).await
     }
+
+    async fn ack_message(&self, project: &str, topic: &str, message_id: &str) -> Result<(), ServiceError> {
+        self.message_repository.ack_message(project, topic, message_id).await
+    }
 }

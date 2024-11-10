@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::sync::Arc;
 use actix_web::{App, HttpServer, web};
+use crate::domain::usecase::ack_message_use_case::AckMessageUseCase;
 use crate::domain::usecase::create_message_use_case::CreateMessageUseCase;
 use crate::domain::usecase::create_subscription_use_case::CreateSubscriptionUseCase;
 use crate::domain::usecase::create_topic_use_case::CreateTopicUseCase;
@@ -10,7 +11,7 @@ use crate::infrastructure::adapter::out::message::persistence::message_persisten
 use crate::infrastructure::adapter::out::message::server::message_created_notification_adapter::MessageCreatedNotificationAdapter;
 use crate::infrastructure::adapter::out::subscription::subscription_persistence_adapter::SubscriptionPersistenceAdapter;
 use crate::infrastructure::adapter::out::topic::topic_persistence_adapter::TopicPersistenceAdapter;
-use crate::infrastructure::adapter::r#in::message::messages_api::create_message;
+use crate::infrastructure::adapter::r#in::message::messages_api::{ack_message, create_message};
 use crate::infrastructure::adapter::r#in::subscription::subscription_api::{create_subscription, get_subscriptions};
 use crate::infrastructure::adapter::r#in::topic::topic_api::{create_topic, get_topics};
 
@@ -19,7 +20,8 @@ pub struct HttpServerConfig{
     create_subscription_use_case: Arc<CreateSubscriptionUseCase>,
     create_message_use_case: Arc<CreateMessageUseCase>,
     get_topics_use_case: Arc<GetTopicsUseCase>,
-    get_subscription_use_case: Arc<GetSubscriptionsUseCase>
+    get_subscription_use_case: Arc<GetSubscriptionsUseCase>,
+    ack_message_use_case: Arc<AckMessageUseCase>
 }
 
 impl HttpServerConfig{
@@ -29,14 +31,16 @@ impl HttpServerConfig{
         create_subscription_use_case: Arc<CreateSubscriptionUseCase>,
         create_message_use_case: Arc<CreateMessageUseCase>,
         get_topics_use_case: Arc<GetTopicsUseCase>,
-        get_subscription_use_case: Arc<GetSubscriptionsUseCase>
+        get_subscription_use_case: Arc<GetSubscriptionsUseCase>,
+        ack_message_use_case: Arc<AckMessageUseCase>
     ) -> Self{
         Self {
             create_topic_use_case,
             create_subscription_use_case,
             create_message_use_case,
             get_topics_use_case,
-            get_subscription_use_case
+            get_subscription_use_case,
+            ack_message_use_case
         }
     }
 
@@ -47,6 +51,7 @@ impl HttpServerConfig{
         let message_use_case = self.create_message_use_case.clone();
         let get_topics_use_case = self.get_topics_use_case.clone();
         let get_subscription_use_case = self.get_subscription_use_case.clone();
+        let ack_message_use_case = self.ack_message_use_case.clone();
 
         match HttpServer::new( move || {
             App::new()
@@ -62,7 +67,9 @@ impl HttpServerConfig{
                 .service(get_subscriptions)
                 // Message
                 .app_data(web::Data::new(message_use_case.clone()))
+                .app_data(web::Data::new(ack_message_use_case.clone()))
                 .service(create_message)
+                .service(ack_message)
         })
             .bind(address).unwrap_or_else(|_| { panic!("Could not start http server") })
             .run()

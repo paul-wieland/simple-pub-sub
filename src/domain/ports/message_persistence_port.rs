@@ -5,6 +5,8 @@ use crate::domain::model::service_error::ServiceError;
 #[async_trait]
 pub trait MessagePersistencePort: Send + Sync{
 
-    async fn create_message(&self,message: PubSubMessage) -> Result<(), ServiceError>;
+    async fn create_message(&self, message: PubSubMessage) -> Result<(), ServiceError>;
+
+    async fn ack_message(&self, project: &str, topic: &str, message_id: &str) -> Result<(), ServiceError>;
 
 }
