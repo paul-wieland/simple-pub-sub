@@ -1,6 +1,5 @@
 # Simple Pub Sub
 
------
 ## Connect as Message Publisher
 
 ***Simple Pub Sub*** publishers open a TCP connection port ```8060``` to publish messages.
@@ -31,7 +30,6 @@ $ {"data": "my-data"}
 "message":"Successfully published message"
 }
 ```
------
 ## Connect as Message Subscriber
 
 ***Simple Pub Sub*** subscribers open a TCP connection o port ```8070``` to receive messages.
@@ -70,7 +68,6 @@ $ {
 "acknowledged":false
 }
 ```
------
 
 ## HTTP Endpoints
 
@@ -78,7 +75,6 @@ $ {
 
 ***Note: Use these endpoints to create topics and subscriptions before creating TCP connections.***
 
------
 
 ### Topics
 
@@ -98,7 +94,6 @@ curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics' \
 curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics'
 ```
 
------
 ### Subscriptions
 
 #### Create subscription
@@ -116,7 +111,6 @@ curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/su
 ```
 curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/subscriptions'
 ```
------
 ### Messages
 
 #### Publish a message
@@ -137,13 +131,21 @@ curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/me
 ```
 curl --location --request PATCH 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/messages/65a120d2-4d08-40b5-a7cf-8fe853d0a38f'
 ```
------
 # Architecture Overview
 
 <p align="center">
 <img src="/drawing/simple-pub-sub-architecture.png" alt=""/>
 </p>
 
-https://chesedo.me/blog/manual-dependency-injection-rust/
+# Future Work
 
+- [ ] Dockerize the service
+- [ ] Add application configuration file
+- [ ] Integration tests (Using test containers)
+- [ ] Performance / Load Testing
+- [ ] Allow subscriptions with filter bases on message attributes
+- [ ] Authentication and Authorization
+
+
+https://chesedo.me/blog/manual-dependency-injection-rust/
 https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust#the-repository-pattern-in-rust
