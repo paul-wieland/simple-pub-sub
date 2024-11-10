@@ -123,10 +123,8 @@ curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/me
 
 # Architecture Overview
 
-## Message Publisher and Subscriber Flow
-
 <p align="center">
-<img src="/drawing/architecture.png" alt=""/>
+<img src="/drawing/simple-pub-sub-architecture.png" alt=""/>
 </p>
 
 https://chesedo.me/blog/manual-dependency-injection-rust/
