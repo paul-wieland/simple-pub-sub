@@ -76,7 +76,9 @@ $ {
 
 ***Note: Use these endpoints to create topics and subscriptions before creating TCP connections.***
 
-### Create topic
+### Topics
+
+#### Create topic
 
 ```
 curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics' \
@@ -86,13 +88,15 @@ curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics' \
 }'
 ```
 
-### Get topics
+#### Get topics
 
 ```
 curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics'
 ```
 
-### Create subscription
+### Subscriptions
+
+#### Create subscription
 
 ```
 curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/subscriptions' \
@@ -102,13 +106,15 @@ curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/su
 }'
 ```
 
-### Get subscriptions
+#### Get subscriptions
 
 ```
 curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/subscriptions'
 ```
 
-### Publish a message
+### Messages
+
+#### Publish a message
 
 ```
 curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/messages' \
@@ -119,6 +125,12 @@ curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/me
         "type": "UserRegisteredEvent"
     }
 }'
+```
+
+#### Acknowledge message
+
+```
+curl --location --request PATCH 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/messages/65a120d2-4d08-40b5-a7cf-8fe853d0a38f'
 ```
 
 # Architecture Overview
