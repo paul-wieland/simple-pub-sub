@@ -7,6 +7,7 @@ use std::sync::Arc;
 use crate::domain::usecase::create_message_use_case::CreateMessageUseCase;
 use crate::domain::usecase::create_subscription_use_case::CreateSubscriptionUseCase;
 use crate::domain::usecase::create_topic_use_case::CreateTopicUseCase;
+use crate::domain::usecase::get_subscriptions_use_case::GetSubscriptionsUseCase;
 use crate::domain::usecase::get_topics_use_case::GetTopicsUseCase;
 use crate::infrastructure::adapter::config::http_server_config::HttpServerConfig;
 use crate::infrastructure::adapter::out::message::persistence::message_persistence_adapter::MessagePersistenceAdapter;
@@ -52,13 +53,20 @@ async fn main() -> Result<(), Box<dyn Error>>{
       )
     );
 
+    let get_subscription_use_case = Arc::new(
+        GetSubscriptionsUseCase::new(
+            Box::new(SubscriptionPersistenceAdapter::new().await?)
+        )
+    );
+
     let publisher = PublisherServer::new(create_message_use_case.clone());
     let subscriber = SubscriberServer::new(message_notification_adapter.clone());
     let http = HttpServerConfig::new(
         create_topic_use_case.clone(),
         create_subscription_use_case.clone(),
         create_message_use_case.clone(),
-        get_topics_use_case.clone()
+        get_topics_use_case.clone(),
+        get_subscription_use_case.clone()
     );
 
     // Servers

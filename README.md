@@ -92,7 +92,7 @@ curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics' \
 curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics'
 ```
 
-### Create a subscription
+### Create subscription
 
 ```
 curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/subscriptions' \
@@ -100,6 +100,12 @@ curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/su
 --data '{
     "subscription": "my-subscription"
 }'
+```
+
+### Get subscriptions
+
+```
+curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/subscriptions'
 ```
 
 ### Publish a message
