@@ -4,6 +4,7 @@ mod domain;
 use std::error::Error;
 use std::{env};
 use std::sync::Arc;
+use crate::domain::usecase::ack_message_use_case::AckMessageUseCase;
 use crate::domain::usecase::create_message_use_case::CreateMessageUseCase;
 use crate::domain::usecase::create_subscription_use_case::CreateSubscriptionUseCase;
 use crate::domain::usecase::create_topic_use_case::CreateTopicUseCase;
@@ -59,6 +60,12 @@ async fn main() -> Result<(), Box<dyn Error>>{
         )
     );
 
+    let ack_message_use_case = Arc::new(
+        AckMessageUseCase::new(
+            Box::new(MessagePersistenceAdapter::new().await?)
+        )
+    );
+
     let publisher = PublisherServer::new(create_message_use_case.clone());
     let subscriber = SubscriberServer::new(message_notification_adapter.clone());
     let http = HttpServerConfig::new(
@@ -66,7 +73,8 @@ async fn main() -> Result<(), Box<dyn Error>>{
         create_subscription_use_case.clone(),
         create_message_use_case.clone(),
         get_topics_use_case.clone(),
-        get_subscription_use_case.clone()
+        get_subscription_use_case.clone(),
+        ack_message_use_case.clone()
     );
 
     // Servers
