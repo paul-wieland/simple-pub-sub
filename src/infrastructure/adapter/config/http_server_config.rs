@@ -11,6 +11,7 @@ use crate::infrastructure::adapter::out::message::persistence::message_persisten
 use crate::infrastructure::adapter::out::message::server::message_created_notification_adapter::MessageCreatedNotificationAdapter;
 use crate::infrastructure::adapter::out::subscription::subscription_persistence_adapter::SubscriptionPersistenceAdapter;
 use crate::infrastructure::adapter::out::topic::topic_persistence_adapter::TopicPersistenceAdapter;
+use crate::infrastructure::adapter::r#in::health_check::health_check_api::health_check;
 use crate::infrastructure::adapter::r#in::message::messages_api::{ack_message, create_message};
 use crate::infrastructure::adapter::r#in::subscription::subscription_api::{create_subscription, get_subscriptions};
 use crate::infrastructure::adapter::r#in::topic::topic_api::{create_topic, get_topics};
@@ -70,6 +71,8 @@ impl HttpServerConfig{
                 .app_data(web::Data::new(ack_message_use_case.clone()))
                 .service(create_message)
                 .service(ack_message)
+                // Health Check
+                .service(health_check)
         })
             .bind(address).unwrap_or_else(|_| { panic!("Could not start http server") })
             .run()
