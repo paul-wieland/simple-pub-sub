@@ -1,5 +1,20 @@
 # Simple Pub Sub
 
+This is a simple pub-sub implementation written in Rust. Currently, it supports
+raw TCP sockets for publishing and subscribing to topics. Furthermore, there are endpoints to manage subscriptions and topics.
+
+The simple-pub-sub allows multiple subscribers and publisher for a topic. A subscription can be used by multiple consumers (e.g. multiple container in a microservice setup).
+A message will only be delivered once to a subscription using round-robin to select a consumer.
+
+Furthermore, the [Hexagonal Architecture](https://vaadin.com/blog/ddd-part-3-domain-driven-design-and-the-hexagonal-architecture) was implemented
+to make TCP and REST endpoints easily replaceable by future developments (e.g. leverage gRPC).
+
+# Architecture Overview
+
+<p align="center">
+<img src="/drawing/simple-pub-sub-architecture.png" alt=""/>
+</p>
+
 ## Connect as Message Publisher
 
 ***Simple Pub Sub*** publishers open a TCP connection port ```8060``` to publish messages.
@@ -131,14 +146,14 @@ curl --location 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/me
 ```
 curl --location --request PATCH 'http://127.0.0.1:8080/v1/projects/my-project/topics/my-topic/messages/65a120d2-4d08-40b5-a7cf-8fe853d0a38f'
 ```
-# Architecture Overview
-
-<p align="center">
-<img src="/drawing/simple-pub-sub-architecture.png" alt=""/>
-</p>
 
 # Future Work
 
+- [x] Creat subscription REST endpoints 
+- [x] Creat topic REST endpoints 
+- [x] Creat TCP endpoints for publishing and subscribing messages 
+- [x] Persist messages using MongoDB 
+- [ ] Replace raw TCP sockets and REST endpoints by gRPC
 - [ ] Dockerize the service
 - [ ] Add application configuration file
 - [ ] Integration tests (Using test containers)
@@ -149,3 +164,5 @@ curl --location --request PATCH 'http://127.0.0.1:8080/v1/projects/my-project/to
 
 https://chesedo.me/blog/manual-dependency-injection-rust/
 https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust#the-repository-pattern-in-rust
+
+https://www.googlecloudcommunity.com/gc/Cloud-Product-Articles/Demystifying-Pub-Sub-An-Introduction-to-Asynchronous/ta-p/670972
