@@ -7,7 +7,7 @@ The simple-pub-sub allows multiple subscribers and publisher for a topic. A subs
 A message will only be delivered once to a subscription using round-robin to select a consumer.
 
 Furthermore, the [Hexagonal Architecture](https://vaadin.com/blog/ddd-part-3-domain-driven-design-and-the-hexagonal-architecture) was implemented
-to make TCP and REST endpoints easily replaceable by future developments (e.g. leverage gRPC).
+to make TCP and REST endpoints easily replaceable by future developments (e.g. leverage gRPC). Also, the persistence layer (MongoDB) can be easily replaced by any other technology.
 
 # Architecture Overview
 
@@ -149,9 +149,9 @@ curl --location --request PATCH 'http://127.0.0.1:8080/v1/projects/my-project/to
 
 # Future Work
 
-- [x] Creat subscription REST endpoints 
-- [x] Creat topic REST endpoints 
-- [x] Creat TCP endpoints for publishing and subscribing messages 
+- [x] Create subscription REST endpoints 
+- [x] Create topic REST endpoints 
+- [x] Create TCP endpoints for publishing and subscribing messages 
 - [x] Persist messages using MongoDB 
 - [ ] Replace raw TCP sockets and REST endpoints by gRPC
 - [ ] Dockerize the service
@@ -160,9 +160,3 @@ curl --location --request PATCH 'http://127.0.0.1:8080/v1/projects/my-project/to
 - [ ] Performance / Load Testing
 - [ ] Allow subscriptions with filter bases on message attributes
 - [ ] Authentication and Authorization
-
-
-https://chesedo.me/blog/manual-dependency-injection-rust/
-https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust#the-repository-pattern-in-rust
-
-https://www.googlecloudcommunity.com/gc/Cloud-Product-Articles/Demystifying-Pub-Sub-An-Introduction-to-Asynchronous/ta-p/670972
